@@ -9,7 +9,7 @@ on:
   
 jobs:
   main:
-    run-on: ubuntu-latest
+    runs-on: ubuntu-latest
     steps:
       # Checkout code
       - uses: actions/checkout@v3
@@ -47,7 +47,5 @@ jobs:
         with:
           push: true
           context: .
-          build-args:
-            -  ${{ env[format('{0}_REPO_URL', steps.metadata.outputs.firmware_type)] }}
-          tags: 
-            - ${{ steps.metadata.outputs.image_tag }}
+          build-args: ${{ env[format('{0}_REPO_URL', steps.metadata.outputs.firmware_type)] }}
+          tags: ${{ steps.metadata.outputs.image_tag }}
