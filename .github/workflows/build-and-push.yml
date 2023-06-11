@@ -21,7 +21,7 @@ jobs:
         run: |
           ref_tag=$(echo ${{ github.ref }} | sed -e "s#refs/tags/##")
           echo firmware_version=$(echo $ref_tag | sed -e "s#\(ofw-\)\?##") >> $GITHUB_OUTPUT
-          echo image_tag=f0-firmware:$ref_tag >> $GITHUB_OUTPUT
+          echo image_tag=${{ vars.IMAGE_PREFIX }}/f0-firmware:$ref_tag >> $GITHUB_OUTPUT
           
           # Determine firmware type
           firmware_typere="^([A-Za-z]+)([0-9]+)?-.*"
