@@ -13,13 +13,13 @@ jobs:
     steps:
       # Checkout code
       - uses: actions/checkout@v3
-      # Generate metadata
-      - name: Generate metadata information
-        id: metadata
+      # Generate aux information
+      - name: Generate aux variables
+        id: aux
         run: |
           ref_tag=$(echo ${{ github.ref }} | sed -e "s#refs/tags/##")
           echo firmware_version=$(echo $ref_tag | sed -e "s#\(ofw-\)\?##") >> $GITHUB_OUTPUT
-          echo image_tag="${{ vars.IMAGE_PREFIX }}/f0-firmware:$ref_tag" >> $GITHUB_OUTPUT
+          echo image=f0-firmware:$ref_tag >> $GITHUB_OUTPUT
           
           # Determine firmware type
           firmware_typere="^([A-Za-z]+)([0-9]+)?-.*"
@@ -33,7 +33,12 @@ jobs:
           fi
 
           echo firmware_type="$firmware_type" >> $GITHUB_OUTPUT
-
+      # Get docker metadata
+      - name: Docker metadata
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          images: ${{ steps.aux.outputs.image }}
       # Login into repository package manager
       - name: Login to image repository
         uses: docker/login-action@v2
@@ -47,5 +52,8 @@ jobs:
         with:
           push: true
           context: .
-          build-args: ${{ vars[format('{0}_REPO_URL', steps.metadata.outputs.firmware_type)] }}
-          tags: ${{ steps.metadata.outputs.image_tag }}
+          build-args: | 
+            firmware_repo=${{ vars[format('{0}_REPO_URL', steps.aux.outputs.firmware_type)] }}
+            firmware_version=${{ steps.aux.outputs.firmware_version }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
