@@ -10,6 +10,8 @@ on:
 jobs:
   main:
     runs-on: ubuntu-latest
+    permissions:
+      packages: write
     steps:
       # Checkout code
       - uses: actions/checkout@v3
